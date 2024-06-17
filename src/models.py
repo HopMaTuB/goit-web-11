@@ -1,5 +1,7 @@
-from src.configuration.database import Base
 from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy.orm import declarative_base
+
+Base = declarative_base()
 
 class Contact(Base):
     __tablename__ = 'contacts'
@@ -9,3 +11,4 @@ class Contact(Base):
     email = Column(String, index=True, unique=True)
     phone_number = Column(String, index=True)
     birth_date = Column(Date)
+    additional_data = Column(String, nullable=True)
