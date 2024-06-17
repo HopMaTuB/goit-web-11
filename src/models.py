@@ -9,4 +9,3 @@ class Contact(Base):
     email = Column(String, index=True, unique=True)
     phone_number = Column(String, index=True)
     birth_date = Column(Date)
-    additional_data = Column(String, nullable=True)
