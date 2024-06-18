@@ -3,7 +3,8 @@ from datetime import date
 from typing import Optional
 
 class ContactBase(BaseModel):
-    name: str
+    first_name: str
+    last_name: str
     email: EmailStr
     phone_number: str
     birth_date: date

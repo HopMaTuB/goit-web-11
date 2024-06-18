@@ -3,6 +3,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from . import contact_crud, models, schemas
 from src.configuration import database
+from sqlalchemy import select
 
 app = FastAPI()
 
@@ -36,3 +37,28 @@ async def delete_contact(contact_id: int, db: Session = Depends(database.get_db)
     if db_contact is None:
         raise HTTPException(status_code=404, detail="Contact not found")
     return db_contact
+
+from datetime import datetime, timedelta
+
+@app.get("/contacts/search/", response_model=list[schemas.Contact])
+async def search_contacts(query: str, db: Session = Depends(database.get_db)):
+    query = f"%{query}%"
+    result = db.execute(
+        select(models.Contact).filter(
+            (models.Contact.first_name.ilike(query)) |
+            (models.Contact.last_name.ilike(query)) |
+            (models.Contact.email.ilike(query))
+        )
+    )
+    return result.scalars().all()
+
+@app.get("/contacts/upcoming_birthdays/", response_model=list[schemas.Contact])
+async def upcoming_birthdays(db: Session = Depends(database.get_db)):
+    today = datetime.today().date()
+    next_week = today + timedelta(days=7)
+    result = db.execute(
+        select(models.Contact).filter(
+            models.Contact.birth_date.between(today, next_week)
+        )
+    )
+    return result.scalars().all()
